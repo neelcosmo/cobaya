@@ -352,6 +352,10 @@ class BAO(InstallableLikelihood):
                 "Hubble": {"z": zs.get("rs_over_DV", None)},
                 "rdrag": None,
             },
+            "DH_over_DM": { # changed by me: added DH_over_DM for DESI DR2 BAO based on Lanyang's likelihood
+                "angular_diameter_distance": {"z": zs.get("DH_over_DM", None)},
+                "Hubble": {"z": zs.get("DH_over_DM", None)},
+            },
             "DM_over_rs": {
                 "angular_diameter_distance": {"z": zs.get("DM_over_rs", None)},
                 "rdrag": None,
@@ -365,6 +369,18 @@ class BAO(InstallableLikelihood):
             "f_sigma8": {
                 "fsigma8": {"z": zs.get("f_sigma8", None)},
             },
+            "f_sigmas8": { # changed by me: added f_sigmas8 for DESI DR2 BAO based on Lanyang's likelihood
+                "sigma_R": {
+                    "z": zs.get("f_sigmas8", None),
+                    "k_max": 2.0,
+                    "vars_pairs": ([("delta_nonu", "delta_nonu")]), # delta_nonu for cdm + baryons is safer than delta_tot for total matter
+                    "R": np.arange(1, 20, 0.5),
+                    },
+                # "Omega_b": {"z": 0},
+                # "Omega_b": {"z": 0},
+                # "Omega_cdm": {"z": 0},
+                "rdrag": None,
+                },
             "F_AP": {
                 "angular_diameter_distance": {"z": zs.get("F_AP", None)},
                 "Hubble": {"z": zs.get("F_AP", None)},
@@ -409,7 +425,7 @@ class BAO(InstallableLikelihood):
                     / self.provider.get_Hubble(z, units="km/s/Mpc")
                 )
                 / self.rs()
-            )
+            )#[0] # changed by me: returning ...[0] instead of ... to return a float instead of a single-element array
         # Idem, inverse
         elif observable == "rs_over_DV":
             return (
@@ -422,14 +438,24 @@ class BAO(InstallableLikelihood):
                 ** (-1)
                 * self.rs()
             )
+        elif observable == "DH_over_DM": # changed by me: added DH_over_DM for DESI DR2 BAO based on Lanyang's likelihood. Also, I switched to c=1 units in DH for compactness.
+            # ans = ((1 / self.provider.get_Hubble(z, units="1/Mpc")) / ((1 + z) * self.provider.get_angular_diameter_distance(z)))[0]
+            # self.log.info(f"DEBUGGING. DH_over_DM is {ans}.")
+            # changed by me: returning ...[0] instead of ... to return a float instead of a single-element array
+            # return ((1 / self.provider.get_Hubble(z, units="1/Mpc")) / ((1 + z) * self.provider.get_angular_diameter_distance(z)))[0]
+            return (1 / self.provider.get_Hubble(z, units="1/Mpc")) / ((1 + z) * self.provider.get_angular_diameter_distance(z))
         # Comoving angular diameter distance, over sound horizon radius
         elif observable == "DM_over_rs":
+            # changed by me: returning ...[0] instead of ... to return a float instead of a single-element array
+            #return ((1 + z) * self.provider.get_angular_diameter_distance(z) / self.rs())[0]
             return (1 + z) * self.provider.get_angular_diameter_distance(z) / self.rs()
         # Physical angular diameter distance, over sound horizon radius
         elif observable == "DA_over_rs":
             return self.provider.get_angular_diameter_distance(z) / self.rs()
         # Hubble distance [c/H(z)] over sound horizon radius.
         elif observable == "DH_over_rs":
+            # changed by me: returning ...[0] instead of ... to return a float instead of a single-element array
+            #return (1 / self.provider.get_Hubble(z, units="1/Mpc") / self.rs())[0]
             return 1 / self.provider.get_Hubble(z, units="1/Mpc") / self.rs()
         # Hubble parameter, times sound horizon radius
         elif observable == "Hz_rs":
@@ -437,6 +463,49 @@ class BAO(InstallableLikelihood):
         # Diff Linear Growth Rate times present amplitude
         elif observable == "f_sigma8":
             return self.provider.get_fsigma8(z)
+        elif observable == "f_sigmas8": # changed by me: added fsigmas8 adapting from Lanyang's code for CAMB and CLASS's effective fsigma8 method
+            # omegab = self.provider.get_Omega_b(z=0)
+            # omegac = self.provider.get_Omega_cdm(z=0)
+            # wb = omegab/(omegab+omegac)
+            # wc = omegac/(omegab+omegac)
+            # s8 = 8 * self.rs()/ 99.0792
+            # z_vc, R_vc, sigma8_vc = self.provider.get_sigma_R(('v_newtonian_cdm', 'v_newtonian_cdm'))
+            # fsigmas8_vc = RectBivariateSpline(z_vc, R_vc, sigma8_vc, kx=3, ky=3)(z, s8)[0][0]
+            # z_vb, R_vb, sigma8_vb = self.provider.get_sigma_R(('v_newtonian_baryon', 'v_newtonian_baryon'))
+            # fsigmas8_vb = RectBivariateSpline(z_vb, R_vb, sigma8_vb, kx=3, ky=3)(z, s8)[0][0]
+            # z_vcb, R_vcb, sigma8_vcb = self.provider.get_sigma_R(('v_newtonian_cdm', 'v_newtonian_baryon'))
+            # fsigmas8_vcb = RectBivariateSpline(z_vcb, R_vcb, sigma8_vcb, kx=3, ky=3)(z, s8)[0][0]
+            # fsigmas8 = wb **2 * fsigmas8_vb + wc ** 2 * fsigmas8_vc + 2 * wb * wc * fsigmas8_vcb
+            #s = 8 * self.rs()/ 99.0792
+            # Definind s and sigma_s8 according to the notation of 2106.07641
+            sbyh = self.rs()/99.0792 # Note that self.rs() is in h^-1 Mpc units, and 99.0792 is rs_fid in Mpc units in DESI's fiducial cosmology
+            z_step = 0.01 # I tend to use 0.01 in both Montepython and Cobaya instead of CLASS's default 0.1
+            z_cb, R_cb, sigma8_cb = self.provider.get_sigma_R(('delta_nonu', 'delta_nonu'))
+            sigma8_cb_interp = RectBivariateSpline(z_cb, R_cb, sigma8_cb) # the sigma_R from CLASS rakes R in Mpc by default, not h^-1 Mpc. So sigma_s8 is given by 
+            if z >= z_step:
+                # return (self.sigma(8,z-z_step,h_units=True)-self.sigma(8,z+z_step,h_units=True))/(2.*z_step)*(1+z)
+                # fss8 = (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
+                # self.log.info(f"DEBUGGING. fss8={fss8}.")
+                #return (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
+                return np.array([(sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)]) # changed by me: returning a single-element array instead of float for compatibility with the other observables
+            else:
+                # if z is between z_step/10 and z_step, reduce z_step to z, and then stick to two-sided derivative
+                if (z > z_step/10.):
+                    z_step = z
+                    # return (self.sigma(8,z-z_step,h_units=True)-self.sigma(8,z+z_step,h_units=True))/(2.*z_step)*(1+z)
+                    # fss8 = (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
+                    # self.log.info(f"DEBUGGING. fss8={fss8}.")
+                    #return (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
+                    return np.array([(sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)])
+                # if z is between 0 and z_step/10, use single-sided derivative with z_step/10
+                else:
+                    z_step /=10
+                    # return (self.sigma(8,z,h_units=True)-self.sigma(8,z+z_step,h_units=True))/z_step*(1+z)
+                    # self.log.info(f"DEBUGGING. fss8={fss8}.")
+                    # fss8 = (sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)
+                    #return (sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)
+                    return np.array([(sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)])
+
         # Anisotropy (Alcock-Paczynski) parameter
         elif observable == "F_AP":
             return (
@@ -465,15 +534,28 @@ class BAO(InstallableLikelihood):
             chi2 = self.interpolator3D(np.array([x, y, z])[:, 0])
             return chi2
         else:
+            # debuglist = [
+            #         self.theory_fun(z, obs)
+            #         for z, obs in zip(self.data["z"], self.data["observable"])
+            #     ]
+            # print(f"DEBUGGING. theory values are {debuglist}.")
             theory = np.array(
                 [
                     self.theory_fun(z, obs)
                     for z, obs in zip(self.data["z"], self.data["observable"])
                 ]
             ).T[0]
+            # theory = np.array(
+            #     [
+            #         self.theory_fun(z, obs)
+            #         for z, obs in zip(self.data["z"], self.data["observable"])
+            #     ]
+            # ).T
+            #self.log.info(f"DEBUGGING. theory values are {theory}.")
             if self.is_debug():
                 for i, (z, obs, theo) in enumerate(
                     zip(self.data["z"], self.data["observable"], theory)
+                    #zip(self.data["z"], self.data["observable"], np.array([theory]))
                 ):
                     self.log.debug(
                         "%s at z=%g : %g (theo) ; %g (data)",

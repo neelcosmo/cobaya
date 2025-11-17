@@ -1,0 +1,238 @@
+# Default configuration for the isw_mgde likelihood
+
+# Speed parameter for internal scheduling (approximate)
+speed: 100
+
+#path: /users/neelshah/cobaya/likelihoods/isw_mgde
+path: /home/user/cobaya/likelihoods/isw_mgde
+data_directory: data
+
+zmax: 5.1
+#zmax: 6.0
+
+l_min_cross: 4
+l_max_cross: 100
+n_bins_cross: 4
+
+use_sdss: True
+use_qso: True
+use_mpz: True
+use_wisc: True
+use_nvss: True
+
+theory_code: hi_class
+
+params:
+
+  b_sdss:
+    prior:
+      min: 0.01
+      max: 2.0
+    ref: 0.68
+    proposal: 0.5
+  b_qso:
+    prior:
+      min: 0.01
+      max: 2.5
+    ref: 0.95
+    proposal: 1.0
+  b_mpz:
+    prior:
+      min: 0.01
+      max: 3.0
+    ref: 1.28
+    proposal: 0.5
+  b_wisc:
+    prior:
+      min: 0.01
+      max: 2.0
+    ref: 0.74
+    proposal: 0.5
+  b_nvss:
+    prior:
+      min: 0.01
+      max: 2.5
+    ref: 0.9
+    proposal: 2.0
+  A_ISW:
+    value: 1.0
+
+sdss_bins:
+
+  sdss_bin_0:
+    cl_cross_file: sdss/cross/cl0.txt
+    cov_cross_file: sdss/cross/cov0.txt
+    cl_auto_file: sdss/auto/cl0.txt
+    cov_auto_file: sdss/auto/cov0.txt
+    dndz_file: sdss/dndz_sdss.txt
+    z_min: 0.1
+    z_max: 0.3
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+  sdss_bin_1:
+    cl_cross_file: sdss/cross/cl1.txt
+    cov_cross_file: sdss/cross/cov1.txt
+    cl_auto_file: sdss/auto/cl1.txt
+    cov_auto_file: sdss/auto/cov1.txt
+    dndz_file: sdss/dndz_sdss.txt
+    z_min: 0.3
+    z_max: 0.4
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+  sdss_bin_2:
+    cl_cross_file: sdss/cross/cl2.txt
+    cov_cross_file: sdss/cross/cov2.txt
+    cl_auto_file: sdss/auto/cl2.txt
+    cov_auto_file: sdss/auto/cov2.txt
+    dndz_file: sdss/dndz_sdss.txt
+    z_min: 0.4
+    z_max: 0.5
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+  sdss_bin_3:
+    cl_cross_file: sdss/cross/cl3.txt
+    cov_cross_file: sdss/cross/cov3.txt
+    cl_auto_file: sdss/auto/cl3.txt
+    cov_auto_file: sdss/auto/cov3.txt
+    dndz_file: sdss/dndz_sdss.txt
+    z_min: 0.5
+    z_max: 0.7
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+  sdss_bin_4:
+    cl_cross_file: sdss/cross/cl4.txt
+    cov_cross_file: sdss/cross/cov4.txt
+    cl_auto_file: sdss/auto/cl4.txt
+    cov_auto_file: sdss/auto/cov4.txt
+    dndz_file: sdss/dndz_sdss.txt
+    z_min: 0.7
+    z_max: 1.0
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+
+qso_bins:
+
+  qso_bin_0:
+    cl_cross_file: qso/cross/cl0.txt
+    cov_cross_file: qso/cross/cov0.txt
+    cl_auto_file: qso/auto/cl0.txt
+    cov_auto_file: qso/auto/cov0.txt
+    dndz_file: qso/dndz_qso.txt
+    z_min: 0.5
+    z_max: 1.0
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+  qso_bin_1:
+    cl_cross_file: qso/cross/cl1.txt
+    cov_cross_file: qso/cross/cov1.txt
+    cl_auto_file: qso/auto/cl1.txt
+    cov_auto_file: qso/auto/cov1.txt
+    dndz_file: qso/dndz_qso.txt
+    z_min: 1.0
+    z_max: 2.0
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+  qso_bin_2:
+    cl_cross_file: qso/cross/cl2.txt
+    cov_cross_file: qso/cross/cov2.txt
+    cl_auto_file: qso/auto/cl2.txt
+    cov_auto_file: qso/auto/cov2.txt
+    dndz_file: qso/dndz_qso.txt
+    z_min: 2.0
+    z_max: 3.0
+    l_min_auto: 10
+    l_max_auto: 70
+    n_bins_auto: 5
+
+wisc_bins:
+
+  wisc_bin_0:
+    cl_cross_file: wisc/cross/cl0.txt
+    cov_cross_file: wisc/cross/cov0.txt
+    cl_auto_file: wisc/auto/cl0.txt
+    cov_auto_file: wisc/auto/cov0.txt
+    dndz_file: wisc/dndz_wisc.txt
+    z_min: 0.09
+    z_max: 0.21
+    l_min_auto: 10
+    l_max_auto: 50
+    n_bins_auto: 4
+  wisc_bin_1:
+    cl_cross_file: wisc/cross/cl1.txt
+    cov_cross_file: wisc/cross/cov1.txt
+    cl_auto_file: wisc/auto/cl1.txt
+    cov_auto_file: wisc/auto/cov1.txt
+    dndz_file: wisc/dndz_wisc.txt
+    z_min: 0.21
+    z_max: 0.3
+    l_min_auto: 10
+    l_max_auto: 50
+    n_bins_auto: 4
+  wisc_bin_2:
+    cl_cross_file: wisc/cross/cl2.txt
+    cov_cross_file: wisc/cross/cov2.txt
+    cl_auto_file: wisc/auto/cl2.txt
+    cov_auto_file: wisc/auto/cov2.txt
+    dndz_file: wisc/dndz_wisc.txt
+    z_min: 0.3
+    z_max: 0.6
+    l_min_auto: 10
+    l_max_auto: 50
+    n_bins_auto: 4
+
+mpz_bins:
+
+  mpz_bin_0:
+    cl_cross_file: mpz/cross/cl0.txt
+    cov_cross_file: mpz/cross/cov0.txt
+    cl_auto_file: mpz/auto/cl0.txt
+    cov_auto_file: mpz/auto/cov0.txt
+    dndz_file: mpz/dndz_mpz.txt
+    z_min: 0.01
+    z_max: 0.105
+    l_min_auto: 10
+    l_max_auto: 60
+    n_bins_auto: 4
+  mpz_bin_1:
+    cl_cross_file: mpz/cross/cl1.txt
+    cov_cross_file: mpz/cross/cov1.txt
+    cl_auto_file: mpz/auto/cl1.txt
+    cov_auto_file: mpz/auto/cov1.txt
+    dndz_file: mpz/dndz_mpz.txt
+    z_min: 0.105
+    z_max: 0.195
+    l_min_auto: 10
+    l_max_auto: 60
+    n_bins_auto: 4
+  mpz_bin_2:
+    cl_cross_file: mpz/cross/cl2.txt
+    cov_cross_file: mpz/cross/cov2.txt
+    cl_auto_file: mpz/auto/cl2.txt
+    cov_auto_file: mpz/auto/cov2.txt
+    dndz_file: mpz/dndz_mpz.txt
+    z_min: 0.195
+    z_max: 0.3
+    l_min_auto: 10
+    l_max_auto: 60
+    n_bins_auto: 4
+
+nvss_bins:
+
+  nvss_bin_0:
+    cl_cross_file: nvss/cross/cl0.txt
+    cov_cross_file: nvss/cross/cov0.txt
+    cl_auto_file: nvss/auto/cl0.txt
+    cov_auto_file: nvss/auto/cov0.txt
+    dndz_file: nvss/dndz_nvss.txt
+    z_min: 0.0
+    z_max: 5.0
+    l_min_auto: 10
+    l_max_auto: 100
+    n_bins_auto: 6

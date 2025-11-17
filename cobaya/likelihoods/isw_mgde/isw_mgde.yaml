@@ -3,8 +3,8 @@
 # Speed parameter for internal scheduling (approximate)
 speed: 100
 
-#path: /users/neelshah/cobaya/likelihoods/isw_mgde
-path: /home/user/cobaya/likelihoods/isw_mgde
+path: /users/neelshah/cobaya_files/data/isw_mgde
+#path: /home/user/cobaya/likelihoods/isw_mgde
 data_directory: data
 
 zmax: 5.1

@@ -1,4 +1,6 @@
 from .bao import BAO as BAO
+#from .bao_camb import BAO_CAMB as BAO_CAMB # changed by me: I need separate interfaces to CAMB and CLASS as they have different ways of getting f_sigma_s8 for DESI full shape
+from .bao import BAO_CAMB as BAO_CAMB
 from .cmblikes import CMBlikes as CMBlikes
 from .cmblikes import make_forecast_cmb_dataset as make_forecast_cmb_dataset
 from .DataSetLikelihood import DataSetLikelihood as DataSetLikelihood

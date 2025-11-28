@@ -415,7 +415,8 @@ class classy(BoltzmannBase):
             elif isinstance(k, tuple) and k[0] == "Pk_grid":
                 self.extra_args["output"] += " mPk"
                 v = deepcopy(v)
-                self.add_P_k_max(v.pop("k_max"), units="1/Mpc")
+                # self.add_P_k_max(v.pop("k_max"), units="1/Mpc")
+                self.add_P_k_max(v["k_max"], units="1/Mpc") # changed by me: maybe the pop method doesn't work when this is requested multiple times
                 # NB: Actually, only the max z is used, and the actual sampling in z
                 # for computing P(k,z) is controlled by `perturb_sampling_stepsize`
                 # (default: 0.1). But let's leave it like this in case this changes
@@ -482,7 +483,8 @@ class classy(BoltzmannBase):
                 )
             elif isinstance(k, tuple) and k[0] == "sigma_R":
                 self.extra_args["output"] += " mPk"
-                self.add_P_k_max(v.pop("k_max"), units="1/Mpc")
+                # self.add_P_k_max(v.pop("k_max"), units="1/Mpc")
+                self.add_P_k_max(v["k_max"], units="1/Mpc") # changed by me: maybe the pop method doesn't work when this is requested multiple times
                 # NB: See note about redshifts in Pk_grid
                 self.add_z_for_matter_power(v["z"])
                 pair = k[1:]

@@ -1,0 +1,3 @@
+[submodule "cobaya/likelihoods/planck_PR4_lensing"]
+	path = cobaya/likelihoods/planck_PR4_lensing
+	url = git@github.com:neelcosmo/planck_PR4_lensing.git

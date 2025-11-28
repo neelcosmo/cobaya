@@ -484,29 +484,39 @@ class BAO(InstallableLikelihood):
             z_step = 0.01 # I tend to use 0.01 in both Montepython and Cobaya instead of CLASS's default 0.1
             z_cb, R_cb, sigma8_cb = self.provider.get_sigma_R(('delta_nonu', 'delta_nonu'))
             sigma8_cb_interp = RectBivariateSpline(z_cb, R_cb, sigma8_cb) # the sigma_R from CLASS rakes R in Mpc by default, not h^-1 Mpc. So sigma_s8 is given by 
-            if z >= z_step:
-                # return (self.sigma(8,z-z_step,h_units=True)-self.sigma(8,z+z_step,h_units=True))/(2.*z_step)*(1+z)
-                # fss8 = (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
-                # self.log.info(f"DEBUGGING. fss8={fss8}.")
-                #return (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
-                return np.array([(sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)]) # changed by me: returning a single-element array instead of float for compatibility with the other observables
-            else:
-                # if z is between z_step/10 and z_step, reduce z_step to z, and then stick to two-sided derivative
-                if (z > z_step/10.):
-                    z_step = z
+            
+            zarr = self.data.loc[self.data["observable"] == "f_sigmas8", "z"].values
+            zmin = zarr[0]
+            zmax = zarr[-1]
+            
+            if (z > zmin) and (z < zmax):
+                if z >= z_step:
                     # return (self.sigma(8,z-z_step,h_units=True)-self.sigma(8,z+z_step,h_units=True))/(2.*z_step)*(1+z)
                     # fss8 = (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
                     # self.log.info(f"DEBUGGING. fss8={fss8}.")
                     #return (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
-                    return np.array([(sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)])
-                # if z is between 0 and z_step/10, use single-sided derivative with z_step/10
+                    return np.array([(sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)]) # changed by me: returning a single-element array instead of float for compatibility with the other observables
                 else:
-                    z_step /=10
-                    # return (self.sigma(8,z,h_units=True)-self.sigma(8,z+z_step,h_units=True))/z_step*(1+z)
-                    # self.log.info(f"DEBUGGING. fss8={fss8}.")
-                    # fss8 = (sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)
-                    #return (sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)
-                    return np.array([(sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)])
+                    # if z is between z_step/10 and z_step, reduce z_step to z, and then stick to two-sided derivative
+                    if (z > z_step/10.):
+                        z_step = z
+                        # return (self.sigma(8,z-z_step,h_units=True)-self.sigma(8,z+z_step,h_units=True))/(2.*z_step)*(1+z)
+                        # fss8 = (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
+                        # self.log.info(f"DEBUGGING. fss8={fss8}.")
+                        #return (sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)
+                        return np.array([(sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/(2.*z_step)*(1+z)])
+                    # if z is between 0 and z_step/10, use single-sided derivative with z_step/10
+                    else:
+                        z_step /=10
+                        # return (self.sigma(8,z,h_units=True)-self.sigma(8,z+z_step,h_units=True))/z_step*(1+z)
+                        # self.log.info(f"DEBUGGING. fss8={fss8}.")
+                        # fss8 = (sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)
+                        #return (sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)
+                        return np.array([(sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)])
+            elif z <= zmin:
+                return np.array([(sigma8_cb_interp(z, sbyh*8)[0][0]-sigma8_cb_interp(z + z_step, sbyh*8)[0][0])/z_step*(1+z)])
+            else: # z >= zmax
+                return np.array([(sigma8_cb_interp(z - z_step, sbyh*8)[0][0]-sigma8_cb_interp(z, sbyh*8)[0][0])/z_step*(1+z)])
 
         # Anisotropy (Alcock-Paczynski) parameter
         elif observable == "F_AP":
@@ -875,6 +885,8 @@ class BAO_CAMB(InstallableLikelihood):
             wb = omegab/(omegab+omegac)
             wc = omegac/(omegab+omegac)
             s8 = 8 * self.rs()/ 99.0792
+            #s8 = s8*self.provider.get_param("H0")/100.0 # changed by me: Checking whether multiplying by h here helps with the discrepancy between CAMB and CLASS results
+            #s8 = s8/(self.provider.get_param("H0")/100.0) # changed by me: Checking whether dividing by h here helps with the discrepancy between CAMB and CLASS results
             z_vc, R_vc, sigma8_vc = self.provider.get_sigma_R(('v_newtonian_cdm', 'v_newtonian_cdm'))
             fsigmas8_vc = RectBivariateSpline(z_vc, R_vc, sigma8_vc, kx=3, ky=3)(z, s8)[0][0]
             z_vb, R_vb, sigma8_vb = self.provider.get_sigma_R(('v_newtonian_baryon', 'v_newtonian_baryon'))
